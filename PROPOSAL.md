@@ -6,7 +6,7 @@
 - Mingyue Shang, [shangmy](https://github.com/shangmy)
 
 ## Introduction
-We propose to build an In-App messaging platform using rust. It is like the system firebase provides: https://firebase.google.com/products/in-app-messaging. We would like to build a micro service system that provides third party servers the ability let users send messages to each other. 
+We propose to build an In-App messaging platform using rust. It is like the system firebase provides: https://firebase.google.com/products/in-app-messaging. We would like to build a micro service system that provides third party servers the ability let users send messages to each other. Comparing to the programming languages with GC, we believe that Rust could provide a better performance for processing messages and notifications when encountering high QPS.
 
 ## Features
 1. Peer-to-peer messages: Users send message to each other. Admins send message to any individual user. 
@@ -34,3 +34,8 @@ We propose to build an In-App messaging platform using rust. It is like the syst
 1. Support multi media messages, like form and interactive messages.
 2. Retract messages
 3. Channels support
+
+## Use cases
+Modern Web Applications adn Mobile Applications usually need to have in app messeging features to let users talk to each other. For example, GitHub have notification systems that notify user of mention. Airbnb let hosts send messages to guests.
+
+
