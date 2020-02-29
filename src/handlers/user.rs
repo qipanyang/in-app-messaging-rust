@@ -1,4 +1,3 @@
-use crate::database::PoolType;
 use crate::errors::ApiError;
 use crate::helpers::{respond_json, respond_ok};
 use crate::models::user::{create, delete, find, get_all, NewUser, User};
@@ -8,6 +7,7 @@ use rayon::prelude::*;
 use serde::Serialize;
 use uuid::Uuid;
 use validator::Validate;
+use crate::database::PoolType;
 
 #[derive(Debug, Deserialize, Serialize, PartialEq)]
 pub struct UserResponse {

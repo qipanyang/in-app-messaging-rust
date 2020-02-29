@@ -15,9 +15,6 @@ use uuid::parser::ParseError;
 pub enum ApiError {
     BadRequest(String),
     BlockingError(String),
-    CacheError(String),
-    CannotDecodeJwtToken(String),
-    CannotEncodeJwtToken(String),
     InternalServerError(String),
     NotFound(String),
     ParseError(String),
