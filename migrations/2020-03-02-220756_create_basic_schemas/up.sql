@@ -26,6 +26,8 @@ create table inbox
         primary key,
     userId     int                                 not null,
     messageId  int                                 not null,
+    status            int                                 not null comment '10 - unread
+20 - read, 30 - archived',
     created_at timestamp default CURRENT_TIMESTAMP not null,
     updated_at timestamp default CURRENT_TIMESTAMP not null
 );
@@ -35,8 +37,6 @@ create table message
     id                int auto_increment
         primary key,
     sent_time         timestamp default CURRENT_TIMESTAMP not null,
-    status            int                                 not null comment '10 - unread
-20 - read',
     content_id        int                                 not null,
     user_id_triggered int                                 not null comment 'The user who triggered this message',
     created_at        timestamp default CURRENT_TIMESTAMP not null,
