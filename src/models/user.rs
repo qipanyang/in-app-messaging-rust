@@ -1,26 +1,27 @@
 use crate::database::PoolType;
 use crate::errors::ApiError;
 use crate::handlers::user::{UserResponse, UsersResponse};
-use crate::schema::users;
-use chrono::{NaiveDateTime, Utc};
+use chrono::{NaiveDateTime};
 use diesel::prelude::*;
-use uuid::Uuid;
+use crate::schema::users;
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Queryable, Identifiable, Insertable)]
 pub struct User {
-    pub id: String,
+    pub id: i32,
+    pub username: String,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Insertable)]
+#[table_name= "users"]
 pub struct NewUser {
-    pub id: String,
+    pub username: String,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct UpdateUser {
-    pub id: String,
+    pub username: String,
 }
 
 /// Get all users
@@ -34,13 +35,13 @@ pub fn get_all(pool: &PoolType) -> Result<UsersResponse, ApiError> {
 }
 
 /// Find a user by the user's id or error out
-pub fn find(pool: &PoolType, user_id: Uuid) -> Result<UserResponse, ApiError> {
-    use crate::schema::users::dsl::{id, users};
+pub fn find(pool: &PoolType, username: String) -> Result<UserResponse, ApiError> {
+    use crate::schema::users::dsl::{username as username_pred, users};
 
-    let not_found = format!("User {} not found", user_id);
+    let not_found = format!("User {:?} not found", username);
     let conn = pool.get()?;
     let user = users
-        .filter(id.eq(user_id.to_string()))
+        .filter(username_pred.eq(username))
         .first::<User>(&conn)
         .map_err(|_| ApiError::NotFound(not_found))?;
 
@@ -48,31 +49,10 @@ pub fn find(pool: &PoolType, user_id: Uuid) -> Result<UserResponse, ApiError> {
 }
 
 /// Create a new user
-pub fn create(pool: &PoolType, new_user: &User) -> Result<UserResponse, ApiError> {
-    use crate::schema::users::dsl::users;
-
+pub fn create(pool: &PoolType, new_user: &NewUser) -> Result<UserResponse, ApiError> {
+    use crate::schema::users::dsl::{users};
     let conn = pool.get()?;
+    let username = new_user.username.to_owned();
     diesel::insert_into(users).values(new_user).execute(&conn)?;
-    Ok(new_user.clone().into())
-}
-
-/// Delete a user
-pub fn delete(pool: &PoolType, user_id: Uuid) -> Result<(), ApiError> {
-    use crate::schema::users::dsl::{id, users};
-
-    let conn = pool.get()?;
-    diesel::delete(users)
-        .filter(id.eq(user_id.to_string()))
-        .execute(&conn)?;
-    Ok(())
-}
-
-impl From<NewUser> for User {
-    fn from(user: NewUser) -> Self {
-        User {
-            id: user.id,
-            created_at: Utc::now().naive_utc(),
-            updated_at: Utc::now().naive_utc(),
-        }
-    }
+    find(pool, username)
 }

@@ -1,5 +1,5 @@
 table! {
-    admin (id) {
+    admins (id) {
         id -> Integer,
         user_id -> Integer,
         user_role -> Integer,
@@ -11,27 +11,27 @@ table! {
 table! {
     content (id) {
         id -> Integer,
-        content -> Varchar,
+        message_content -> Varchar,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
 }
 
 table! {
-    inbox (id) {
+    inboxs (id) {
         id -> Integer,
         userId -> Integer,
         messageId -> Integer,
+        status -> Integer,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
 }
 
 table! {
-    message (id) {
+    messages (id) {
         id -> Integer,
         sent_time -> Timestamp,
-        status -> Integer,
         content_id -> Integer,
         user_id_triggered -> Integer,
         created_at -> Timestamp,
@@ -40,18 +40,18 @@ table! {
 }
 
 table! {
-    user (id) {
+    users (id) {
         id -> Integer,
-        user_name -> Varchar,
+        username -> Varchar,
         created_at -> Timestamp,
-        update_at -> Timestamp,
+        updated_at -> Timestamp,
     }
 }
 
 allow_tables_to_appear_in_same_query!(
-    admin,
+    admins,
     content,
-    inbox,
-    message,
-    user,
+    inboxs,
+    messages,
+    users,
 );

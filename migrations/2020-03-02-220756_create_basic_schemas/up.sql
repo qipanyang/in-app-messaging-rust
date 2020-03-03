@@ -1,4 +1,4 @@
-create table admin
+create table admins
 (
     id         int auto_increment
         primary key,
@@ -7,32 +7,35 @@ create table admin
 5 - God',
     created_at timestamp default CURRENT_TIMESTAMP not null,
     updated_at timestamp default CURRENT_TIMESTAMP not null,
-    constraint admin_user_id_uindex
+    constraint admins_user_id_uindex
         unique (user_id)
 );
 
 create table content
 (
-    id         int auto_increment
+    id              int auto_increment
         primary key,
-    content    varchar(1024)                       not null,
-    created_at timestamp default CURRENT_TIMESTAMP not null,
-    updated_at timestamp default CURRENT_TIMESTAMP not null
+    message_content varchar(1024)                       not null,
+    created_at      timestamp default CURRENT_TIMESTAMP not null,
+    updated_at      timestamp default CURRENT_TIMESTAMP not null
 );
 
-create table inbox
+create table inboxs
 (
     id         int auto_increment
         primary key,
     userId     int                                 not null,
     messageId  int                                 not null,
-    status            int                                 not null comment '10 - unread
+    status     int                                 not null comment '10 - unread
 20 - read, 30 - archived',
     created_at timestamp default CURRENT_TIMESTAMP not null,
     updated_at timestamp default CURRENT_TIMESTAMP not null
 );
 
-create table message
+create index inbox_status_index
+    on inboxs (status, userId);
+
+create table messages
 (
     id                int auto_increment
         primary key,
@@ -43,23 +46,20 @@ create table message
     updated_at        timestamp default CURRENT_TIMESTAMP not null
 );
 
-create index message_sent_time_index
-    on message (sent_time);
+create index messages_sent_time_index
+    on messages (sent_time);
 
-create index message_status_index
-    on message (status);
+create index messages_user_id_triggered_index
+    on messages (user_id_triggered);
 
-create index message_user_id_triggered_index
-    on message (user_id_triggered);
-
-create table user
+create table users
 (
     id         int auto_increment
         primary key,
-    user_name  varchar(256)                        not null,
+    username   varchar(256)                        not null,
     created_at timestamp default CURRENT_TIMESTAMP not null,
-    update_at  timestamp default CURRENT_TIMESTAMP not null,
-    constraint table_name_user_name_uindex
-        unique (user_name)
+    updated_at timestamp default CURRENT_TIMESTAMP not null,
+    constraint table_name_username_uindex
+        unique (username)
 );
 

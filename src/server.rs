@@ -6,11 +6,6 @@ use crate::routes::routes;
 use crate::state::new_state;
 use actix_cors::Cors;
 use actix_web::{middleware::Logger, App, HttpServer};
-use actix_web::web;
-use crate::handlers::user::create_user;
-use diesel::MysqlConnection;
-use crate::models::user::{User, NewUser, create};
-use actix_web::web::block;
 
 pub async fn server() -> std::io::Result<()> {
     dotenv::dotenv().ok();
@@ -26,9 +21,8 @@ pub async fn server() -> std::io::Result<()> {
         App::new()
             .wrap(Cors::new().supports_credentials().finish())
             .wrap(Logger::default())
-//            .configure(add_pool)
             .data(pool.clone())
-//            .app_data(data.clone())
+            .app_data(data.clone())
             .configure(routes)
     })
     .workers(4);
