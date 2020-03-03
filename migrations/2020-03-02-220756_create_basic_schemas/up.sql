@@ -24,8 +24,8 @@ create table inboxs
 (
     id         int auto_increment
         primary key,
-    userId     int                                 not null,
-    messageId  int                                 not null,
+    user_id     int                                 not null,
+    message_id  VARCHAR(36)                                 not null,
     status     int                                 not null comment '10 - unread
 20 - read, 30 - archived',
     created_at timestamp default CURRENT_TIMESTAMP not null,
@@ -33,11 +33,11 @@ create table inboxs
 );
 
 create index inbox_status_index
-    on inboxs (status, userId);
+    on inboxs (status, user_id);
 
 create table messages
 (
-    id                int auto_increment
+    id                VARCHAR(36)                         not null
         primary key,
     sent_time         timestamp default CURRENT_TIMESTAMP not null,
     content_id        int                                 not null,

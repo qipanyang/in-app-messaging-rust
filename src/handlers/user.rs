@@ -1,17 +1,17 @@
+use crate::database::PoolType;
 use crate::errors::ApiError;
-use crate::helpers::{respond_json};
+use crate::helpers::respond_json;
 use crate::models::user::{create, find, get_all, NewUser, User};
 use crate::validate::validate;
 use actix_web::web::{block, Data, Json, Path};
 use rayon::prelude::*;
 use serde::Serialize;
-use uuid::Uuid;
 use validator::Validate;
-use crate::database::PoolType;
 
 #[derive(Debug, Deserialize, Serialize, PartialEq)]
 pub struct UserResponse {
     pub id: i32,
+    pub username: String,
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq)]
@@ -45,24 +45,21 @@ pub async fn create_user(
 ) -> Result<Json<UserResponse>, ApiError> {
     validate(&params)?;
 
-    // temporarily use the new user's id for created_at/updated_at
-    // update when auth is added
-    let user_id = Uuid::new_v4();
     let new_user: NewUser = NewUser {
-        username: user_id.to_string(),
+        username: params.username.to_owned(),
     };
     let user = block(move || create(&pool, &new_user)).await?;
-    respond_json(user.into())
+    respond_json(user)
 }
 
 impl From<User> for UserResponse {
     fn from(user: User) -> Self {
         UserResponse {
             id: user.id,
+            username: user.username,
         }
     }
 }
-
 
 impl From<Vec<User>> for UsersResponse {
     fn from(users: Vec<User>) -> Self {

@@ -1,9 +1,9 @@
 use crate::database::PoolType;
 use crate::errors::ApiError;
 use crate::handlers::user::{UserResponse, UsersResponse};
-use chrono::{NaiveDateTime};
-use diesel::prelude::*;
 use crate::schema::users;
+use chrono::NaiveDateTime;
+use diesel::prelude::*;
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Queryable, Identifiable, Insertable)]
 pub struct User {
@@ -14,7 +14,7 @@ pub struct User {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Insertable)]
-#[table_name= "users"]
+#[table_name = "users"]
 pub struct NewUser {
     pub username: String,
 }
@@ -50,7 +50,7 @@ pub fn find(pool: &PoolType, username: String) -> Result<UserResponse, ApiError>
 
 /// Create a new user
 pub fn create(pool: &PoolType, new_user: &NewUser) -> Result<UserResponse, ApiError> {
-    use crate::schema::users::dsl::{users};
+    use crate::schema::users::dsl::users;
     let conn = pool.get()?;
     let username = new_user.username.to_owned();
     diesel::insert_into(users).values(new_user).execute(&conn)?;
