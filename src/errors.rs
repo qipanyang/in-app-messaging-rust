@@ -8,7 +8,7 @@ use diesel::{
     r2d2::PoolError,
     result::{DatabaseErrorKind, Error as DBError},
 };
-use uuid::parser::ParseError;
+use uuid::Error as UuidError;
 
 #[derive(Debug, Display, PartialEq)]
 #[allow(dead_code)]
@@ -93,8 +93,8 @@ impl From<PoolError> for ApiError {
 }
 
 /// Convert ParseErrors to ApiErrors
-impl From<ParseError> for ApiError {
-    fn from(error: ParseError) -> ApiError {
+impl From<UuidError> for ApiError {
+    fn from(error: UuidError) -> ApiError {
         ApiError::ParseError(error.to_string())
     }
 }

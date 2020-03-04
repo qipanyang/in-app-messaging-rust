@@ -11,9 +11,9 @@ create table admins
         unique (user_id)
 );
 
-create table content
+create table contents
 (
-    id              int auto_increment
+    id              varchar(36) not null
         primary key,
     message_content varchar(1024)                       not null,
     created_at      timestamp default CURRENT_TIMESTAMP not null,

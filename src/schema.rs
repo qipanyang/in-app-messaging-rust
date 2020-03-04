@@ -9,8 +9,8 @@ table! {
 }
 
 table! {
-    content (id) {
-        id -> Integer,
+    contents (id) {
+        id -> Varchar,
         message_content -> Varchar,
         created_at -> Timestamp,
         updated_at -> Timestamp,
@@ -48,4 +48,4 @@ table! {
     }
 }
 
-allow_tables_to_appear_in_same_query!(admins, content, inboxs, messages, users,);
+allow_tables_to_appear_in_same_query!(admins, contents, inboxs, messages, users,);
