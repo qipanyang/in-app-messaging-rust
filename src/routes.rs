@@ -1,6 +1,7 @@
 //! Place all Actix routes here, multiple route configs can be used and
 //! combined.
 
+use crate::handlers::admin::{assign_admin, get_admin};
 use crate::handlers::content::{create_content, get_content};
 use crate::handlers::health::get_health;
 use crate::handlers::message::{create_message, get_message};
@@ -27,6 +28,11 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
                     web::scope("/message")
                         .route("/create", web::post().to(create_message))
                         .route("/find/{id}", web::get().to(get_message)),
+                )
+                .service(
+                    web::scope("/admin")
+                        .route("/assign", web::post().to(assign_admin))
+                        .route("/is_admin", web::get().to(get_admin)),
                 ),
         );
 }
