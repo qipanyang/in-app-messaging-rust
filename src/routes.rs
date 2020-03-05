@@ -3,6 +3,7 @@
 
 use crate::handlers::content::{create_content, get_content};
 use crate::handlers::health::get_health;
+use crate::handlers::message::{create_message, get_message};
 use crate::handlers::user::{create_user, get_user};
 use actix_web::web;
 
@@ -21,6 +22,11 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
                     web::scope("/content")
                         .route("/create", web::post().to(create_content))
                         .route("/find/{id}", web::get().to(get_content)),
+                )
+                .service(
+                    web::scope("/message")
+                        .route("/create", web::post().to(create_message))
+                        .route("/find/{id}", web::get().to(get_message)),
                 ),
         );
 }

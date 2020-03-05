@@ -32,7 +32,7 @@ table! {
     messages (id) {
         id -> Varchar,
         sent_time -> Timestamp,
-        content_id -> Integer,
+        content_id -> Varchar,
         user_id_triggered -> Integer,
         created_at -> Timestamp,
         updated_at -> Timestamp,
@@ -48,4 +48,10 @@ table! {
     }
 }
 
-allow_tables_to_appear_in_same_query!(admins, contents, inboxs, messages, users,);
+allow_tables_to_appear_in_same_query!(
+    admins,
+    contents,
+    inboxs,
+    messages,
+    users,
+);

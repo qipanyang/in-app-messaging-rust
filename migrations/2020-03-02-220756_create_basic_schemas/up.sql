@@ -40,7 +40,7 @@ create table messages
     id                VARCHAR(36)                         not null
         primary key,
     sent_time         timestamp default CURRENT_TIMESTAMP not null,
-    content_id        int                                 not null,
+    content_id        VARCHAR(36)                         not null,
     user_id_triggered int                                 not null comment 'The user who triggered this message',
     created_at        timestamp default CURRENT_TIMESTAMP not null,
     updated_at        timestamp default CURRENT_TIMESTAMP not null
