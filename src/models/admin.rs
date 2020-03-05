@@ -22,7 +22,7 @@ pub struct NewAdmin {
 }
 
 pub fn find(pool: &PoolType, user_id: i32) -> Result<AdminResponse, ApiError> {
-    use crate::schema::admins::dsl::{user_id as user_id_pred, admins};
+    use crate::schema::admins::dsl::{admins, user_id as user_id_pred};
     let not_found = format!("Admin {:?} not found", user_id);
     let conn = pool.get()?;
     let admin = admins

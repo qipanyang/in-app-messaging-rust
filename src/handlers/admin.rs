@@ -5,7 +5,6 @@ use crate::models::admin::{create, find, Admin, NewAdmin};
 use crate::models::user::find as find_user;
 use crate::validate::validate;
 use actix_web::web::{block, Data, Json, Path};
-use rayon::prelude::*;
 use serde::Serialize;
 use validator::Validate;
 
@@ -36,17 +35,16 @@ pub async fn assign_admin(
     params: Json<CreateAdminRequest>,
 ) -> Result<Json<AdminResponse>, ApiError> {
     validate(&params)?;
-    let not_found = format!("User {:?} not found", params.username.to_owned());
-    let user_role = params.user_role;
-    let user = block( move || find_user(&pool, params.username.to_owned()))
-        .await
-        .or(Err(ApiError::NotFound(not_found)))?;
 
-    let new_admin: NewAdmin = NewAdmin {
-        user_id: user.id,
-        user_role,
-    };
-    let admin = block(move || create(&pool, &new_admin)).await?;
+    let admin = block(move || {
+        let user = find_user(&pool, params.username.to_owned())?;
+        let new_admin: NewAdmin = NewAdmin {
+            user_id: user.id,
+            user_role: params.user_role,
+        };
+        create(&pool, &new_admin)
+    }).await?;
+
     respond_json(admin)
 }
 
