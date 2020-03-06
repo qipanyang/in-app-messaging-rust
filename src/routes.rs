@@ -6,6 +6,7 @@ use crate::handlers::content::{create_content, get_content};
 use crate::handlers::health::get_health;
 use crate::handlers::message::{create_message, get_message};
 use crate::handlers::user::{create_user, get_user};
+use crate::handlers::inbox::{get_inbox_by_user, insert};
 use actix_web::web;
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
@@ -32,7 +33,12 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
                 .service(
                     web::scope("/admin")
                         .route("/assign", web::post().to(assign_admin))
-                        .route("/is_admin", web::get().to(get_admin)),
+                        .route("/is_admin/{id}", web::get().to(get_admin)),
+                )
+                .service(
+                    web::scope("/inbox")
+                        .route("/insert", web::post().to(insert))
+                        .route("/find/{id}", web::get().to(get_inbox_by_user)),
                 ),
         );
 }
