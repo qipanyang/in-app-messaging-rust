@@ -1,0 +1,171 @@
+openapi: 3.0.0
+# https://app.swaggerhub.com/apis/yuanchenxi95/in-app-messaging/1.0.0
+# Added by API Auto Mocking Plugin
+info:
+  description: In app messaging API
+  version: "1.0.0"
+  title: In App Messaging API
+  contact:
+    email: yuanchenxi95@gmail.com
+tags:
+  # - name: admins
+  #   description: Secured Admin-only calls
+  - name: users
+    description: Operations available to regular users
+paths:
+  /user/create:
+    post:
+      tags:
+        - users
+      summary: create the user
+      operationId: userCreate
+      description: Create the user with the given username
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserItem'
+      responses:
+        '200':
+          description: successfully send the message
+        '400':
+          description: bad input parameter
+  /inbox:
+    get:
+      tags:
+        - users
+      summary: list messages
+      operationId: listMessages
+      description: Get the inbox messages of the given user
+      parameters:
+        - in: path
+          name: username
+          description: the username of the inbox to query
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: status
+          description: the status of the messages
+          required: true
+          schema:
+            $ref: '#/components/schemas/MessageStatus'
+      responses:
+        '200':
+          description: successfully queried the message
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MessageItem'
+        '400':
+          description: bad input parameter
+  /message/send:
+    post:
+      tags:
+        - users
+      summary: send message
+      operationId: sendMessage
+      description: send the message to the users
+      parameters:
+        - in: path
+          name: username
+          description: the username of the inbox to query
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMessageItem'
+      responses:
+        '200':
+          description: successfully send the message
+        '400':
+          description: bad input parameter
+  /message/status/change:
+    post:
+      tags:
+        - users
+      summary: mark message
+      operationId: markMessage
+      description: mark the message with the given status
+      parameters:
+        - in: path
+          name: messageId
+          description: the id of the message
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: status
+          description: the status of the message
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successfully send the message
+        '400':
+          description: bad input parameter
+
+components:
+  schemas:
+    MessageItem:
+      type: object
+      required:
+        - id
+        - sent_time
+        - content
+        - user_id_triggered
+        - status
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "d290f1ee-6c54-4b01-90e6-d701748f0851"
+        sent_time:
+          type: string
+          format: date-time
+          example: "2017-07-21T17:32:28Z"
+        content:
+          type: string
+          example: "This is a message"
+        username_triggered:
+          type: string
+          example: "testUser"
+        status:
+          $ref: '#/components/schemas/MessageStatus'
+    SendMessageItem:
+      type: object
+      required:
+        - content
+        - users
+      properties:
+        content:
+          type: string
+          example: "This is a message"
+        usernames:
+          type: array
+          items:
+            type: string
+          example: ["hello", "testUser"]
+    CreateUserItem:
+      type: object
+      required:
+        - username
+      properties:
+        username:
+          type: string
+    MessageStatus:
+      type: string
+      enum: ["unread", "read", "archived", "saved"]
+# Added by API Auto Mocking Plugin
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/yuanchenxi95/in-app-messaging/1.0.0
