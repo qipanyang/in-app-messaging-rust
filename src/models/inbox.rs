@@ -6,7 +6,6 @@ use crate::schema::inboxs;
 use chrono::NaiveDateTime;
 use diesel::prelude::*;
 
-
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Queryable, Identifiable, Insertable)]
 pub struct Inbox {
     pub id: i32,
@@ -36,9 +35,10 @@ pub fn insert_inbox(pool: &PoolType, new_inbox: &NewInbox) -> Result<InboxRespon
     find(pool, user_id, message_id)
 }
 
-
 pub fn find(pool: &PoolType, user_id: i32, message_id: String) -> Result<InboxResponse, ApiError> {
-    use crate::schema::inboxs::dsl::{inboxs, user_id as user_id_pred, message_id as message_id_pred};
+    use crate::schema::inboxs::dsl::{
+        inboxs, message_id as message_id_pred, user_id as user_id_pred,
+    };
     let not_found = format!("inbox item {:?} and {:?} not found", user_id, message_id);
     let conn = pool.get()?;
     let inbox = inboxs

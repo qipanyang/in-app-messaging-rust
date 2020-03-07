@@ -1,7 +1,7 @@
 use crate::database::PoolType;
 use crate::errors::ApiError;
 use crate::helpers::respond_json;
-use crate::models::inbox::{insert_inbox, find_by_user, Inbox, NewInbox};
+use crate::models::inbox::{find_by_user, insert_inbox, Inbox, NewInbox};
 use crate::validate::validate;
 use actix_web::web::{block, Data, Json, Path};
 use rayon::prelude::*;
@@ -35,7 +35,7 @@ pub async fn insert(
     let new_inbox: NewInbox = NewInbox {
         user_id: params.user_id,
         message_id: params.message_id.to_owned(),
-        status:params.status,
+        status: params.status,
     };
     let inbox = block(move || insert_inbox(&pool, &new_inbox)).await?;
     respond_json(inbox)
@@ -48,7 +48,6 @@ pub async fn get_inbox_by_user(
     let inboxs = block(move || find_by_user(&pool, user_id.to_owned())).await?;
     respond_json(inboxs)
 }
-
 
 impl From<Inbox> for InboxResponse {
     fn from(inbox: Inbox) -> Self {

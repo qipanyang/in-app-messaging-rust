@@ -35,15 +35,14 @@ pub fn get_all(pool: &PoolType) -> Result<UsersResponse, ApiError> {
 }
 
 /// Find a user by the user's id or error out
-pub fn find(pool: &PoolType, username: String) -> Result<UserResponse, ApiError> {
+pub fn find(pool: &PoolType, username: &str) -> Result<UserResponse, ApiError> {
     use crate::schema::users::dsl::{username as username_pred, users};
 
-    let not_found = format!("User {:?} not found", username);
     let conn = pool.get()?;
     let user = users
         .filter(username_pred.eq(username))
         .first::<User>(&conn)
-        .map_err(|_| ApiError::NotFound(not_found))?;
+        .map_err(|_| ApiError::NotFound(format!("User {:?} not found", username.to_owned())))?;
 
     Ok(user.into())
 }
@@ -54,5 +53,5 @@ pub fn create(pool: &PoolType, new_user: &NewUser) -> Result<UserResponse, ApiEr
     let conn = pool.get()?;
     let username = new_user.username.to_owned();
     diesel::insert_into(users).values(new_user).execute(&conn)?;
-    find(pool, username)
+    find(pool, &username)
 }

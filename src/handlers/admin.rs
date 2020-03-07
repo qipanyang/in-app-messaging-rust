@@ -37,13 +37,14 @@ pub async fn assign_admin(
     validate(&params)?;
 
     let admin = block(move || {
-        let user = find_user(&pool, params.username.to_owned())?;
+        let user = find_user(&pool, &params.username)?;
         let new_admin: NewAdmin = NewAdmin {
             user_id: user.id,
             user_role: params.user_role,
         };
         create(&pool, &new_admin)
-    }).await?;
+    })
+    .await?;
 
     respond_json(admin)
 }

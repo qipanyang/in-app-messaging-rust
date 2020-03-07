@@ -28,7 +28,7 @@ pub async fn get_user(
     username: Path<String>,
     pool: Data<PoolType>,
 ) -> Result<Json<UserResponse>, ApiError> {
-    let user = block(move || find(&pool, username.to_owned())).await?;
+    let user = block(move || find(&pool, &username)).await?;
     respond_json(user)
 }
 

@@ -26,8 +26,7 @@ create table inboxs
         primary key,
     user_id     int                                 not null,
     message_id  VARCHAR(36)                                 not null,
-    status     int                                 not null comment '10 - unread
-20 - read, 30 - archived',
+    status     int                                 not null comment '10 - unread, 20 - read, 30 - archived, 40 - saved',
     created_at timestamp default CURRENT_TIMESTAMP not null,
     updated_at timestamp default CURRENT_TIMESTAMP not null
 );
