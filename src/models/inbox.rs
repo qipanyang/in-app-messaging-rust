@@ -34,7 +34,7 @@ pub fn insert_inbox(pool: &PoolType, new_inbox: &NewInbox) -> Result<Inbox, ApiE
     find(pool, user_id, message_id)
 }
 
-pub fn find(pool: &PoolType, user_id: i32, message_id: String) -> Result<Inbox, ApiError> {
+pub fn find(pool: &PoolType, user_id: i32, message_id: &str) -> Result<Inbox, ApiError> {
     use crate::schema::inboxs::dsl::{
         inboxs, message_id as message_id_pred, user_id as user_id_pred,
     };
