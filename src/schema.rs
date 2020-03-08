@@ -19,7 +19,7 @@ table! {
 
 table! {
     inboxs (id) {
-        id -> Integer,
+        id -> Varchar,
         user_id -> Integer,
         message_id -> Varchar,
         status -> Integer,

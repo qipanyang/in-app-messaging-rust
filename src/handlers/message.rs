@@ -90,6 +90,7 @@ pub async fn send_message(
             };
             create(&pool, &new_message)?;
             let new_inbox = NewInbox {
+                id: Uuid::new_v4().to_string(),
                 user_id: sent_to_user_id.to_owned(),
                 message_id: new_message.id,
                 status: MessageStatus::Unread as i32,

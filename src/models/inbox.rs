@@ -7,7 +7,7 @@ use diesel::prelude::*;
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Queryable, Identifiable, Insertable)]
 pub struct Inbox {
-    pub id: i32,
+    pub id: String,
     pub user_id: i32,
     pub message_id: String,
     pub status: i32,
@@ -18,6 +18,7 @@ pub struct Inbox {
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Insertable)]
 #[table_name = "inboxs"]
 pub struct NewInbox {
+    pub id: String,
     pub user_id: i32,
     pub message_id: String,
     pub status: i32,
@@ -31,7 +32,7 @@ pub fn insert_inbox(pool: &PoolType, new_inbox: &NewInbox) -> Result<Inbox, ApiE
     diesel::insert_into(inboxs)
         .values(new_inbox)
         .execute(&conn)?;
-    find(pool, user_id, message_id)
+    find(pool, user_id, &message_id)
 }
 
 pub fn find(pool: &PoolType, user_id: i32, message_id: &str) -> Result<Inbox, ApiError> {

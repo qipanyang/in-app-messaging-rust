@@ -12,6 +12,8 @@ use chrono::NaiveDateTime;
 use crate::models::message_status::MessageStatus;
 use crate::models::message::find as find_message;
 use crate::models::content::find as find_content;
+use uuid::Uuid;
+
 
 #[derive(Debug, Serialize, PartialEq)]
 pub struct InboxMessageResponse {
@@ -40,6 +42,7 @@ pub async fn insert(
 ) -> Result<Json<Inbox>, ApiError> {
     validate(&params)?;
     let new_inbox: NewInbox = NewInbox {
+        id: Uuid::new_v4().to_string(),
         user_id: params.user_id,
         message_id: params.message_id.to_owned(),
         status: params.status,

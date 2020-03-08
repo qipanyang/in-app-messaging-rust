@@ -22,7 +22,7 @@ create table contents
 
 create table inboxs
 (
-    id         int auto_increment
+    id         varchar (36) not null
         primary key,
     user_id     int                                 not null,
     message_id  VARCHAR(36)                                 not null,
