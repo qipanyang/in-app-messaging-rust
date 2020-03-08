@@ -33,7 +33,7 @@ pub async fn get_message(
     id: Path<String>,
     pool: Data<PoolType>,
 ) -> Result<Json<MessageResponse>, ApiError> {
-    let message = block(move || find(&pool, id.to_owned())).await?;
+    let message = block(move || find(&pool, &id)).await?;
     respond_json(message)
 }
 

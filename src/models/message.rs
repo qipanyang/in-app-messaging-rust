@@ -25,7 +25,7 @@ pub struct NewMessage {
     pub user_id_triggered: i32,
 }
 
-pub fn find(pool: &PoolType, id: String) -> Result<MessageResponse, ApiError> {
+pub fn find(pool: &PoolType, id: &str) -> Result<MessageResponse, ApiError> {
     use crate::schema::messages::dsl::{id as id_pred, messages};
     let not_found = format!("Message {} not found", id);
     let conn = pool.get()?;
@@ -44,5 +44,5 @@ pub fn create(pool: &PoolType, new_message: &NewMessage) -> Result<MessageRespon
     diesel::insert_into(messages)
         .values(new_message)
         .execute(&conn)?;
-    find(pool, id)
+    find(pool, &id)
 }

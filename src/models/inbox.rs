@@ -1,7 +1,6 @@
 use crate::database::PoolType;
 use crate::errors::ApiError;
 //use crate::handlers::user::{UserResponse, UsersResponse};
-use crate::handlers::inbox::{InboxResponse, InboxsResponse};
 use crate::schema::inboxs;
 use chrono::NaiveDateTime;
 use diesel::prelude::*;
@@ -24,7 +23,7 @@ pub struct NewInbox {
     pub status: i32,
 }
 
-pub fn insert_inbox(pool: &PoolType, new_inbox: &NewInbox) -> Result<InboxResponse, ApiError> {
+pub fn insert_inbox(pool: &PoolType, new_inbox: &NewInbox) -> Result<Inbox, ApiError> {
     use crate::schema::inboxs::dsl::inboxs;
     let conn = pool.get()?;
     let user_id = new_inbox.user_id;
@@ -35,7 +34,7 @@ pub fn insert_inbox(pool: &PoolType, new_inbox: &NewInbox) -> Result<InboxRespon
     find(pool, user_id, message_id)
 }
 
-pub fn find(pool: &PoolType, user_id: i32, message_id: String) -> Result<InboxResponse, ApiError> {
+pub fn find(pool: &PoolType, user_id: i32, message_id: String) -> Result<Inbox, ApiError> {
     use crate::schema::inboxs::dsl::{
         inboxs, message_id as message_id_pred, user_id as user_id_pred,
     };
@@ -46,10 +45,10 @@ pub fn find(pool: &PoolType, user_id: i32, message_id: String) -> Result<InboxRe
         .first::<Inbox>(&conn)
         .map_err(|_| ApiError::NotFound(not_found))?;
 
-    Ok(inbox.into())
+    Ok(inbox)
 }
 
-pub fn find_by_user(pool: &PoolType, user_id: i32) -> Result<InboxsResponse, ApiError> {
+pub fn find_by_user(pool: &PoolType, user_id: i32) -> Result<Vec<Inbox>, ApiError> {
     use crate::schema::inboxs::dsl::{inboxs, user_id as user_id_pred};
     let not_found = format!("inbox item {:?} not found", user_id);
     let conn = pool.get()?;
@@ -58,5 +57,5 @@ pub fn find_by_user(pool: &PoolType, user_id: i32) -> Result<InboxsResponse, Api
         .load::<Inbox>(&conn)
         .map_err(|_| ApiError::NotFound(not_found))?;
 
-    Ok(inbox_user.into())
+    Ok(inbox_user)
 }

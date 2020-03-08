@@ -25,7 +25,7 @@ pub async fn get_content(
     id: Path<String>,
     pool: Data<PoolType>,
 ) -> Result<Json<ContentResponse>, ApiError> {
-    let content = block(move || find(&pool, id.to_owned())).await?;
+    let content = block(move || find(&pool, &id)).await?;
     respond_json(content)
 }
 

@@ -34,7 +34,7 @@ pub fn get_all(pool: &PoolType) -> Result<UsersResponse, ApiError> {
     Ok(all_users.into())
 }
 
-/// Find a user by the user's id or error out
+/// Find a user by the user's username or error out
 pub fn find(pool: &PoolType, username: &str) -> Result<UserResponse, ApiError> {
     use crate::schema::users::dsl::{username as username_pred, users};
 
@@ -43,6 +43,19 @@ pub fn find(pool: &PoolType, username: &str) -> Result<UserResponse, ApiError> {
         .filter(username_pred.eq(username))
         .first::<User>(&conn)
         .map_err(|_| ApiError::NotFound(format!("User {:?} not found", username.to_owned())))?;
+
+    Ok(user.into())
+}
+
+/// Find a user by the user's id or error out
+pub fn find_by_id(pool: &PoolType, user_id: i32) -> Result<UserResponse, ApiError> {
+    use crate::schema::users::dsl::{id as id_pred, users};
+
+    let conn = pool.get()?;
+    let user = users
+        .filter(id_pred.eq(user_id))
+        .first::<User>(&conn)
+        .map_err(|_| ApiError::NotFound(format!("User {} not found", user_id)))?;
 
     Ok(user.into())
 }

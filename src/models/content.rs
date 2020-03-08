@@ -21,7 +21,7 @@ pub struct NewContent {
     pub message_content: String,
 }
 
-pub fn find(pool: &PoolType, id: String) -> Result<ContentResponse, ApiError> {
+pub fn find(pool: &PoolType, id: &str) -> Result<ContentResponse, ApiError> {
     use crate::schema::contents::dsl::{contents, id as id_pred};
     let not_found = format!("Content {} not found", id);
     let conn = pool.get()?;
@@ -40,5 +40,5 @@ pub fn create(pool: &PoolType, new_content: &NewContent) -> Result<ContentRespon
     diesel::insert_into(contents)
         .values(new_content)
         .execute(&conn)?;
-    find(pool, id)
+    find(pool, &id)
 }

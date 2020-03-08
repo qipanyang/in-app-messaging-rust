@@ -7,17 +7,24 @@ use actix_web::web::{block, Data, Json, Path};
 use rayon::prelude::*;
 use serde::Serialize;
 use validator::Validate;
+use crate::models::user::{find as find_user, find_by_id};
+use chrono::NaiveDateTime;
+use crate::models::message_status::MessageStatus;
+use crate::models::message::find as find_message;
+use crate::models::content::find as find_content;
 
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
-pub struct InboxResponse {
-    pub id: i32,
-    pub user_id: i32,
-    pub message_id: String,
-    pub status: i32,
+#[derive(Debug, Serialize, PartialEq)]
+pub struct InboxMessageResponse {
+    pub id: String,
+    pub username: String,
+    pub content: String,
+    pub sent_time: NaiveDateTime,
+    pub username_triggered: String,
+    pub status: MessageStatus,
 }
 
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
-pub struct InboxsResponse(pub Vec<InboxResponse>);
+#[derive(Debug, Serialize, PartialEq)]
+pub struct InboxMessagesResponse(pub Vec<InboxMessageResponse>);
 
 #[derive(Clone, Debug, Deserialize, Serialize, Validate)]
 pub struct CreateInboxRequest {
@@ -30,7 +37,7 @@ pub struct CreateInboxRequest {
 pub async fn insert(
     pool: Data<PoolType>,
     params: Json<CreateInboxRequest>,
-) -> Result<Json<InboxResponse>, ApiError> {
+) -> Result<Json<Inbox>, ApiError> {
     validate(&params)?;
     let new_inbox: NewInbox = NewInbox {
         user_id: params.user_id,
@@ -42,26 +49,37 @@ pub async fn insert(
 }
 
 pub async fn get_inbox_by_user(
-    user_id: Path<i32>,
+    username: Path<String>,
     pool: Data<PoolType>,
-) -> Result<Json<InboxsResponse>, ApiError> {
-    let inboxs = block(move || find_by_user(&pool, user_id.to_owned())).await?;
-    respond_json(inboxs)
-}
+) -> Result<Json<InboxMessagesResponse>, ApiError> {
+    let inbox_messages = block(move || {
+        let user = find_user(&pool, &username)?;
+        let inboxs = find_by_user(&pool, user.id)?;
+        let mut messages = Vec::with_capacity(inboxs.len());
+        for inbox in inboxs {
+            let message = find_message(&pool, &inbox.message_id)?;
+            let username_triggered = find_by_id(&pool, message.user_id_triggered)?;
+            let content = find_content(&pool, &message.content_id)?;
 
-impl From<Inbox> for InboxResponse {
-    fn from(inbox: Inbox) -> Self {
-        InboxResponse {
-            id: inbox.id,
-            user_id: inbox.user_id,
-            message_id: inbox.message_id,
-            status: inbox.status,
+            let message = InboxMessageResponse {
+                id: message.id,
+                username: user.username.to_owned(),
+                content: content.content,
+                sent_time: message.sent_time,
+                username_triggered: username_triggered.username,
+                status: MessageStatus::from_i32(inbox.status)?,
+            };
+
+            messages.push(message);
+
         }
-    }
+        Ok(InboxMessagesResponse(messages))
+    }).await?;
+    respond_json(inbox_messages)
 }
 
-impl From<Vec<Inbox>> for InboxsResponse {
-    fn from(inboxs: Vec<Inbox>) -> Self {
-        InboxsResponse(inboxs.into_par_iter().map(|inbox| inbox.into()).collect())
+impl From<Vec<InboxMessageResponse>> for InboxMessagesResponse {
+    fn from(inbox_messages: Vec<InboxMessageResponse>) -> Self {
+        InboxMessagesResponse(inbox_messages.into_par_iter().map(|inbox| inbox).collect())
     }
 }
