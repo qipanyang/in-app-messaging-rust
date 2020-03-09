@@ -37,8 +37,8 @@ pub struct CreateInboxRequest {
 
 #[derive(Clone, Debug, Deserialize, Serialize, Validate)]
 pub struct ChangeInboxRequest {
-    pub inbox_id: String,
-    pub status: i32,
+    pub message_id: String,
+    pub status: String,
 }
 
 pub async fn insert(
@@ -91,7 +91,7 @@ pub async fn change_inbox_status(
     params: Json<ChangeInboxRequest>,
 ) -> Result<Json<Inbox>, ApiError> {
     validate(&params)?;
-    let inbox = block(move || update_status(&pool, &params.inbox_id, params.status)).await?;
+    let inbox = block(move || update_status(&pool, &params.message_id, &params.status)).await?;
     respond_json(inbox)
 }
 

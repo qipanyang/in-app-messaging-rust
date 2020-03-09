@@ -4,6 +4,8 @@ use crate::errors::ApiError;
 use crate::schema::inboxs;
 use chrono::NaiveDateTime;
 use diesel::prelude::*;
+use crate::models::message_status::MessageStatus;
+use std::str::FromStr;
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Queryable, Identifiable, Insertable)]
 pub struct Inbox {
@@ -61,15 +63,16 @@ pub fn find_by_user(pool: &PoolType, user_id: i32) -> Result<Vec<Inbox>, ApiErro
     Ok(inbox_user)
 }
 
-pub fn update_status(pool: &PoolType, inbox_id: &str, new_status: i32) -> Result<Inbox, ApiError> {
-    use crate::schema::inboxs::dsl::{id, inboxs, status};
+pub fn update_status(pool: &PoolType, message_id: &str, new_status: &str) -> Result<Inbox, ApiError> {
+    let new_status = MessageStatus::from_str(new_status)? as i32;
+    use crate::schema::inboxs::dsl::{message_id as message_id_pred, inboxs, status};
     let conn = pool.get()?;
-    diesel::update(inboxs.filter(id.eq(inbox_id)))
+    diesel::update(inboxs.filter(message_id_pred.eq(message_id)))
         .set(status.eq(new_status))
         .execute(&conn)?;
-    let not_found = format!("inbox item {:?} not found", inbox_id);
+    let not_found = format!("inbox item {:?} not found", message_id);
     let inbox = inboxs
-        .filter(id.eq(inbox_id))
+        .filter(message_id_pred.eq(message_id))
         .first::<Inbox>(&conn)
         .map_err(|_| ApiError::NotFound(not_found))?;
     Ok(inbox)
