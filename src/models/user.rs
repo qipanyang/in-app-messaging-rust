@@ -47,6 +47,20 @@ pub fn find(pool: &PoolType, username: &str) -> Result<UserResponse, ApiError> {
     Ok(user.into())
 }
 
+/// Find users by their username or error out
+pub fn find_users(pool: &PoolType, usernames: Vec<&str>) -> Result<UsersResponse, ApiError> {
+    use crate::schema::users::dsl::{username as username_pred, users};
+
+    let conn = pool.get()?;
+    let users_result: Vec<User> = users
+        .filter(username_pred.eq_any(&usernames))
+        .load::<User>(&conn)?;
+    if users_result.len() != usernames.len() {
+        ApiError::NotFound(String::from("Some users not found."));
+    }
+    Ok(users_result.into())
+}
+
 /// Find a user by the user's id or error out
 pub fn find_by_id(pool: &PoolType, user_id: i32) -> Result<UserResponse, ApiError> {
     use crate::schema::users::dsl::{id as id_pred, users};
