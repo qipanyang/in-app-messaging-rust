@@ -60,3 +60,17 @@ pub fn find_by_user(pool: &PoolType, user_id: i32) -> Result<Vec<Inbox>, ApiErro
 
     Ok(inbox_user)
 }
+
+pub fn update_status(pool: &PoolType, inbox_id: &str, new_status: i32) -> Result<Inbox, ApiError> {
+    use crate::schema::inboxs::dsl::{id, inboxs, status};
+    let conn = pool.get()?;
+    diesel::update(inboxs.filter(id.eq(inbox_id)))
+        .set(status.eq(new_status))
+        .execute(&conn)?;
+    let not_found = format!("inbox item {:?} not found", inbox_id);
+    let inbox = inboxs
+        .filter(id.eq(inbox_id))
+        .first::<Inbox>(&conn)
+        .map_err(|_| ApiError::NotFound(not_found))?;
+    Ok(inbox)
+}

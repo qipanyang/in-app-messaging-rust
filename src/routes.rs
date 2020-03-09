@@ -4,8 +4,8 @@
 use crate::handlers::admin::{assign_admin, get_admin};
 use crate::handlers::content::{create_content, get_content};
 use crate::handlers::health::get_health;
-use crate::handlers::inbox::{get_inbox_by_user, insert};
-use crate::handlers::message::{send_message};
+use crate::handlers::inbox::{change_inbox_status, get_inbox_by_user, insert};
+use crate::handlers::message::send_message;
 use crate::handlers::user::{create_user, get_user};
 use actix_web::web;
 
@@ -26,8 +26,7 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
                         .route("/find/{id}", web::get().to(get_content)),
                 )
                 .service(
-                    web::scope("/message")
-                        .route("/send/{username}", web::post().to(send_message))
+                    web::scope("/message").route("/send/{username}", web::post().to(send_message)),
                 )
                 .service(
                     web::scope("/admin")
@@ -37,7 +36,8 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
                 .service(
                     web::scope("/inbox")
                         .route("/insert", web::post().to(insert))
-                        .route("/find/{username}", web::get().to(get_inbox_by_user)),
+                        .route("/find/{username}", web::get().to(get_inbox_by_user))
+                        .route("/change", web::post().to(change_inbox_status)),
                 ),
         );
 }

@@ -1,19 +1,18 @@
 use crate::database::PoolType;
 use crate::errors::ApiError;
 use crate::helpers::respond_json;
-use crate::models::inbox::{find_by_user, insert_inbox, Inbox, NewInbox};
+use crate::models::content::find as find_content;
+use crate::models::inbox::{find_by_user, insert_inbox, update_status, Inbox, NewInbox};
+use crate::models::message::find as find_message;
+use crate::models::message_status::MessageStatus;
+use crate::models::user::{find as find_user, find_by_id};
 use crate::validate::validate;
 use actix_web::web::{block, Data, Json, Path};
+use chrono::NaiveDateTime;
 use rayon::prelude::*;
 use serde::Serialize;
-use validator::Validate;
-use crate::models::user::{find as find_user, find_by_id};
-use chrono::NaiveDateTime;
-use crate::models::message_status::MessageStatus;
-use crate::models::message::find as find_message;
-use crate::models::content::find as find_content;
 use uuid::Uuid;
-
+use validator::Validate;
 
 #[derive(Debug, Serialize, PartialEq)]
 pub struct InboxMessageResponse {
@@ -33,6 +32,12 @@ pub struct CreateInboxRequest {
     pub user_id: i32,
     #[validate(length(min = 3, message = "id length must be greater than 3"))]
     pub message_id: String,
+    pub status: i32,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, Validate)]
+pub struct ChangeInboxRequest {
+    pub inbox_id: String,
     pub status: i32,
 }
 
@@ -74,11 +79,20 @@ pub async fn get_inbox_by_user(
             };
 
             messages.push(message);
-
         }
         Ok(InboxMessagesResponse(messages))
-    }).await?;
+    })
+    .await?;
     respond_json(inbox_messages)
+}
+
+pub async fn change_inbox_status(
+    pool: Data<PoolType>,
+    params: Json<ChangeInboxRequest>,
+) -> Result<Json<Inbox>, ApiError> {
+    validate(&params)?;
+    let inbox = block(move || update_status(&pool, &params.inbox_id, params.status)).await?;
+    respond_json(inbox)
 }
 
 impl From<Vec<InboxMessageResponse>> for InboxMessagesResponse {
