@@ -97,6 +97,6 @@ pub async fn change_inbox_status(
 
 impl From<Vec<InboxMessageResponse>> for InboxMessagesResponse {
     fn from(inbox_messages: Vec<InboxMessageResponse>) -> Self {
-        InboxMessagesResponse(inbox_messages.into_par_iter().map(|inbox| inbox).collect())
+        InboxMessagesResponse(inbox_messages.into_iter().collect())
     }
 }
