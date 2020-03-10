@@ -52,11 +52,12 @@ pub fn find(pool: &PoolType, user_id: i32, message_id: &str) -> Result<Inbox, Ap
 }
 
 pub fn find_by_user(pool: &PoolType, user_id: i32) -> Result<Vec<Inbox>, ApiError> {
-    use crate::schema::inboxs::dsl::{inboxs, user_id as user_id_pred};
+    use crate::schema::inboxs::dsl::{inboxs, user_id as user_id_pred, created_at};
     let not_found = format!("inbox item {:?} not found", user_id);
     let conn = pool.get()?;
     let inbox_user = inboxs
         .filter(user_id_pred.eq(user_id))
+        .order_by(created_at.desc())
         .load::<Inbox>(&conn)
         .map_err(|_| ApiError::NotFound(not_found))?;
 

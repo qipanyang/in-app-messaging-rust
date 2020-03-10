@@ -80,6 +80,7 @@ pub async fn get_inbox_by_user(
 
             messages.push(message);
         }
+        messages.sort_by(|a, b| b.sent_time.cmp(&a.sent_time));
         Ok(InboxMessagesResponse(messages))
     })
     .await?;
